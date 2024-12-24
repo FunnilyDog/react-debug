@@ -207,6 +207,8 @@ function FiberNode(
 //    is faster.
 // 5) It should be easy to port this to a C struct and keep a C implementation
 //    compatible.
+
+// !creatRoot
 const createFiber = function(
   tag: WorkTag,
   pendingProps: mixed,
@@ -425,6 +427,7 @@ export function resetWorkInProgress(workInProgress: Fiber, renderLanes: Lanes) {
   return workInProgress;
 }
 
+// !createRoot 
 export function createHostRootFiber(
   tag: RootTag,
   isStrictMode: boolean,

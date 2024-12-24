@@ -244,6 +244,7 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
+// !createRoot createContainer
 export function createContainer(
   containerInfo: Container,
   tag: RootTag,
@@ -318,6 +319,7 @@ export function createHydrationContainer(
   return root;
 }
 
+// !render step 3
 export function updateContainer(
   element: ReactNodeList,
   container: OpaqueRoot,
@@ -518,6 +520,7 @@ export {findHostInstanceWithWarning};
 export function findHostInstanceWithNoPortals(
   fiber: Fiber,
 ): PublicInstance | null {
+  // !render 3. ?? 
   const hostFiber = findCurrentHostFiberWithNoPortals(fiber);
   if (hostFiber === null) {
     return null;

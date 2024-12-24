@@ -147,6 +147,7 @@ const Internals = {
   ],
 };
 
+// !createRootImpl 
 function createRoot(
   container: Element | Document | DocumentFragment,
   options?: CreateRootOptions,

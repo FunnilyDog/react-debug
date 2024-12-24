@@ -89,6 +89,8 @@ function ReactDOMRoot(internalRoot: FiberRoot) {
   this._internalRoot = internalRoot;
 }
 
+
+// !render  梦开始 执行 render
 ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = function(
   children: ReactNodeList,
 ): void {
@@ -97,7 +99,7 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = functio
     throw new Error('Cannot update an unmounted root.');
   }
 
-  if (__DEV__) {
+  if (!__DEV__) {
     if (typeof arguments[1] === 'function') {
       console.error(
         'render(...): does not support the second callback argument. ' +
@@ -118,6 +120,7 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = functio
     const container = root.containerInfo;
 
     if (container.nodeType !== COMMENT_NODE) {
+      // !render 2. ???
       const hostInstance = findHostInstanceWithNoPortals(root.current);
       if (hostInstance) {
         if (hostInstance.parentNode !== container) {
@@ -163,6 +166,7 @@ ReactDOMHydrationRoot.prototype.unmount = ReactDOMRoot.prototype.unmount = funct
   }
 };
 
+// !createRootImpl 3
 export function createRoot(
   container: Element | Document | DocumentFragment,
   options?: CreateRootOptions,
@@ -231,6 +235,7 @@ export function createRoot(
     onRecoverableError,
     transitionCallbacks,
   );
+  // node[internalContainerInstanceKey] = hostRoot;
   markContainerAsRoot(root.current, container);
 
   const rootContainerElement: Document | Element | DocumentFragment =

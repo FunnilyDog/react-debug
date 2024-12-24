@@ -120,6 +120,7 @@ function assertIsMounted(fiber) {
 }
 
 export function findCurrentFiberUsingSlowPath(fiber: Fiber): Fiber | null {
+  // 
   const alternate = fiber.alternate;
   if (!alternate) {
     // If there is no alternate, then we only need to check if it is mounted.
@@ -290,6 +291,7 @@ function findCurrentHostFiberImpl(node: Fiber) {
 }
 
 export function findCurrentHostFiberWithNoPortals(parent: Fiber): Fiber | null {
+  // !render 4. ??
   const currentParent = findCurrentFiberUsingSlowPath(parent);
   return currentParent !== null
     ? findCurrentHostFiberWithNoPortalsImpl(currentParent)

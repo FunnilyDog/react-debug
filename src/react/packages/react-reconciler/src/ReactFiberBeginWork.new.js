@@ -3682,6 +3682,7 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
   return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
 }
 
+// ? beginWork
 function beginWork(
   current: Fiber | null,
   workInProgress: Fiber,
