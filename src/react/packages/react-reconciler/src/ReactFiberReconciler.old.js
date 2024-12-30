@@ -321,7 +321,7 @@ export function createHydrationContainer(
 
 // !render step 3
 export function updateContainer(
-  element: ReactNodeList,
+  element: ReactNodeList, // App
   container: OpaqueRoot,
   parentComponent: ?React$Component<any, any>,
   callback: ?Function,
@@ -360,7 +360,16 @@ export function updateContainer(
       );
     }
   }
-
+/**
+ *  type Update<State> = {
+ *   eventTime: number,
+ *   lane: Lane,
+ *   tag: 0 | 1 | 2 | 3,
+ *   payload: Index,
+ *   callback: (() => mixed) | null,
+ *   next: Update<State> | null,
+ *  }
+ */
   const update = createUpdate(eventTime, lane);
   // Caution: React DevTools currently depends on this property
   // being called "element".
@@ -380,6 +389,7 @@ export function updateContainer(
     update.callback = callback;
   }
 
+  // current = root ,
   const root = enqueueUpdate(current, update, lane);
   if (root !== null) {
     scheduleUpdateOnFiber(root, current, lane, eventTime);

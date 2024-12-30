@@ -525,6 +525,7 @@ function requestRetryLane(fiber: Fiber) {
   return claimNextRetryLane();
 }
 
+// !render step 4 !updateState
 export function scheduleUpdateOnFiber(
   root: FiberRoot,
   fiber: Fiber,
@@ -688,6 +689,7 @@ export function isUnsafeClassRenderPhaseUpdate(fiber: Fiber) {
 // of the existing task is the same as the priority of the next level that the
 // root has work on. This function is called on every update, and right before
 // exiting a task.
+// !render mount step 5
 function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
   const existingCallbackNode = root.callbackNode;
 
@@ -809,6 +811,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
         schedulerPriorityLevel = NormalSchedulerPriority;
         break;
     }
+    // !render mount step 6
     newCallbackNode = scheduleCallback(
       schedulerPriorityLevel,
       performConcurrentWorkOnRoot.bind(null, root),
@@ -1832,10 +1835,10 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
-  const current = unitOfWork.alternate;
+  const current = unitOfWork.alternate; // current树上对应的Fiber节点，有可能为null
   setCurrentDebugFiberInDEV(unitOfWork);
 
-  let next;
+  let next; // 用来存放beginWork()返回的结果
   if (enableProfilerTimer && (unitOfWork.mode & ProfileMode) !== NoMode) {
     startProfilerTimer(unitOfWork);
     next = beginWork(current, unitOfWork, subtreeRenderLanes);
@@ -1845,12 +1848,13 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   }
 
   resetCurrentDebugFiberInDEV();
+  // 更新状态了
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
-  if (next === null) {
+  if (next === null) { // beginWork返回null，表示无（或无需关注）当前节点的子Fiber节点
     // If this doesn't spawn new work, complete the current work.
     completeUnitOfWork(unitOfWork);
   } else {
-    workInProgress = next;
+    workInProgress = next; // 下次的workLoopSync/workLoopConcurrent的while循环的循环主体为子Fiber节点
   }
 
   ReactCurrentOwner.current = null;
@@ -1859,7 +1863,7 @@ function performUnitOfWork(unitOfWork: Fiber): void {
 function completeUnitOfWork(unitOfWork: Fiber): void {
   // Attempt to complete the current unit of work, then move to the next
   // sibling. If there are no more siblings, return to the parent fiber.
-  let completedWork = unitOfWork;
+  let completedWork = unitOfWork; // 本次 performUnitOfWork 的循环主体
   do {
     // The current, flushed, state of this fiber is the alternate. Ideally
     // nothing should rely on this, but relying on it here means that we don't
@@ -1870,6 +1874,7 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
     // Check if the work completed or if something threw.
     if ((completedWork.flags & Incomplete) === NoFlags) {
       setCurrentDebugFiberInDEV(completedWork);
+      // 只要 beginWork 阶段正常执行后（即执行无异常），都会进到这一段逻辑来
       let next;
       if (
         !enableProfilerTimer ||
@@ -1936,7 +1941,8 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
         return;
       }
     }
-
+    // 取当前Fiber节点(completedWork)的兄弟(sibling)节点；
+    // 如果有值，则结束completeUnitOfWork，并将该兄弟节点作为下次performUnitOfWork的主体(unitOfWork)
     const siblingFiber = completedWork.sibling;
     if (siblingFiber !== null) {
       // If there is more work to do in this returnFiber, do that next.
@@ -1944,8 +1950,14 @@ function completeUnitOfWork(unitOfWork: Fiber): void {
       return;
     }
     // Otherwise, return to the parent
+    // 若没有兄弟节点，则将在下次do...while循环中处理父节点(completedWork.return)
     completedWork = returnFiber;
     // Update the next thing we're working on in case something throws.
+    // 此处需要注意！
+    // 虽然把workInProgress置为completedWork，但由于没有return，即没有结束completeUnitOfWork，因此没有意义
+    // 直到completedWork（此时实际上是本循环中原completedWork.return）为null，结束do...while循环后
+    // 此时completeUnitOfWork的运行结果(workInProgress)为null
+    // 也意味着performSyncWorkOnRoot/performConcurrentWorkOnRoot中的while循环也达到了结束条件
     workInProgress = completedWork;
   } while (completedWork !== null);
 
@@ -3074,6 +3086,7 @@ export function restorePendingUpdaters(root: FiberRoot, lanes: Lanes): void {
 }
 
 const fakeActCallbackNode = {};
+// !render mount step 6
 function scheduleCallback(priorityLevel, callback) {
   if (__DEV__) {
     // If we're currently inside an `act` scope, bypass Scheduler and push to
@@ -3083,6 +3096,7 @@ function scheduleCallback(priorityLevel, callback) {
       actQueue.push(callback);
       return fakeActCallbackNode;
     } else {
+      // 就是 scheduler里边儿的 unstable_scheduleCallback 方法
       return Scheduler_scheduleCallback(priorityLevel, callback);
     }
   } else {

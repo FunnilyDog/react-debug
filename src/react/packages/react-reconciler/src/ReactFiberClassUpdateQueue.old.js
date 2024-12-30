@@ -199,6 +199,7 @@ export function cloneUpdateQueue<State>(
   }
 }
 
+// eventTime = 53018 lane = 16
 export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   const update: Update<*> = {
     eventTime,
@@ -213,10 +214,11 @@ export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   return update;
 }
 
+// !render 
 export function enqueueUpdate<State>(
-  fiber: Fiber,
-  update: Update<State>,
-  lane: Lane,
+  fiber: Fiber, // root
+  update: Update<State>, // 初始
+  lane: Lane, 
 ): FiberRoot | null {
   const updateQueue = fiber.updateQueue;
   if (updateQueue === null) {

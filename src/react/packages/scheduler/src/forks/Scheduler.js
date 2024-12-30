@@ -144,6 +144,7 @@ function handleTimeout(currentTime) {
   }
 }
 
+// !render
 function flushWork(hasTimeRemaining, initialTime) {
   if (enableProfiling) {
     markSchedulerUnsuspended(initialTime);
@@ -344,7 +345,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
 
   var newTask = {
     id: taskIdCounter++,
-    callback,
+    callback, // performConcurrentWorkOnRoot 方法
     priorityLevel,
     startTime,
     expirationTime,

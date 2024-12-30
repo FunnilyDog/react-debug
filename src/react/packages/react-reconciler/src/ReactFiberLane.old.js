@@ -571,6 +571,7 @@ export function createLaneMap<T>(initial: T): LaneMap<T> {
   return laneMap;
 }
 
+//  !render
 export function markRootUpdated(
   root: FiberRoot,
   updateLane: Lane,

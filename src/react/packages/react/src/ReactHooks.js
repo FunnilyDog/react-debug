@@ -77,6 +77,7 @@ export function useContext<T>(Context: ReactContext<T>): T {
   return dispatcher.useContext(Context);
 }
 
+// !useState 入口
 export function useState<S>(
   initialState: (() => S) | S,
 ): [S, Dispatch<BasicStateAction<S>>] {

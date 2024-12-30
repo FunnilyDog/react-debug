@@ -31,6 +31,7 @@ let concurrentQueues: Array<
   HookQueue<any, any> | ClassQueue<any>,
 > | null = null;
 
+// !render
 export function pushConcurrentUpdateQueue(
   queue: HookQueue<any, any> | ClassQueue<any>,
 ) {
@@ -67,6 +68,7 @@ export function finishQueueingConcurrentUpdates() {
   }
 }
 
+// !updateState step 2
 export function enqueueConcurrentHookUpdate<S, A>(
   fiber: Fiber,
   queue: HookQueue<S, A>,
@@ -109,10 +111,11 @@ export function enqueueConcurrentHookUpdateAndEagerlyBailout<S, A>(
   queue.interleaved = update;
 }
 
+// !render 
 export function enqueueConcurrentClassUpdate<State>(
-  fiber: Fiber,
-  queue: ClassQueue<State>,
-  update: ClassUpdate<State>,
+  fiber: Fiber, // root
+  queue: ClassQueue<State>, // 初始
+  update: ClassUpdate<State>, // update任务
   lane: Lane,
 ) {
   const interleaved = queue.interleaved;
@@ -139,6 +142,7 @@ export function enqueueConcurrentRenderForLane(fiber: Fiber, lane: Lane) {
 // compatibility and should always be accompanied by a warning.
 export const unsafe_markUpdateLaneFromFiberToRoot = markUpdateLaneFromFiberToRoot;
 
+// !render !updateState 也会走到这
 function markUpdateLaneFromFiberToRoot(
   sourceFiber: Fiber,
   lane: Lane,

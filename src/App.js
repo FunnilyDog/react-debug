@@ -3,11 +3,7 @@ import "./App.css";
 import Index from "./pages/test";
 
 function App() {
-  return (
-    <div>
-      <Index />
-    </div>
-  );
+  return <Index />;
 }
 
 export default App;

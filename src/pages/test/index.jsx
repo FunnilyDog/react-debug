@@ -1,12 +1,20 @@
 import * as React from "react";
 
 const Index = () => {
-  const [name, setName] = React.useState("");
+  const [name, setName] = React.useState(0);
 
   return (
     <div>
-      <div>{name}</div>
-      <button onClick={() => setName("Hello")}>Click me</button>
+      <div>cur count{name}</div>
+      <button
+        onClick={() =>
+          setName((state) => {
+            return ++state;
+          })
+        }
+      >
+        Click me
+      </button>
     </div>
   );
 };

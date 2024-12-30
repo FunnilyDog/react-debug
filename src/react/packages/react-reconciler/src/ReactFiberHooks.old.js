@@ -421,6 +421,7 @@ export function renderWithHooks<Props, SecondArg>(
       // This dispatcher does that.
       ReactCurrentDispatcher.current = HooksDispatcherOnMountWithHookTypesInDEV;
     } else {
+      // 初始挂载
       ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
     }
   } else {
@@ -1506,6 +1507,7 @@ function forceStoreRerender(fiber) {
   }
 }
 
+// !useState mount in dev
 function mountState<S>(
   initialState: (() => S) | S,
 ): [S, Dispatch<BasicStateAction<S>>] {
@@ -2230,6 +2232,7 @@ function dispatchReducerAction<S, A>(
   markUpdateInDevTools(fiber, lane, action);
 }
 
+// !updateState 入口
 function dispatchSetState<S, A>(
   fiber: Fiber,
   queue: UpdateQueue<S, A>,
