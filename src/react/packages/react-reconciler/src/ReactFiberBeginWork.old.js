@@ -285,6 +285,7 @@ if (__DEV__) {
   didWarnAboutDefaultPropsOnFunctionComponent = {};
 }
 
+// !render reconcileChildren
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1423,6 +1424,7 @@ function mountHostRootWithoutHydrating(
   return workInProgress.child;
 }
 
+// !render 
 function updateHostComponent(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -1615,6 +1617,7 @@ function mountIncompleteClassComponent(
   );
 }
 
+// !render 
 function mountIndeterminateComponent(
   _current,
   workInProgress,
@@ -3682,6 +3685,7 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
   return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
 }
 
+// !render beginWork
 function beginWork(
   current: Fiber | null,
   workInProgress: Fiber,

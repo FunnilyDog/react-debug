@@ -290,6 +290,7 @@ function dispatchEventsForPlugins(
     eventSystemFlags,
     targetContainer,
   );
+  /** 按事件派发队列执行事件派发 */
   processDispatchQueue(dispatchQueue, eventSystemFlags);
 }
 

@@ -124,6 +124,7 @@ export function enqueueConcurrentClassUpdate<State>(
     update.next = update;
     // At the end of the current render, this queue's interleaved updates will
     // be transferred to the pending queue.
+    /** 将当前 queue 添加到 concurrentQueues */
     pushConcurrentUpdateQueue(queue);
   } else {
     update.next = interleaved.next;
@@ -143,6 +144,8 @@ export function enqueueConcurrentRenderForLane(fiber: Fiber, lane: Lane) {
 export const unsafe_markUpdateLaneFromFiberToRoot = markUpdateLaneFromFiberToRoot;
 
 // !render !updateState 也会走到这
+// 从触发状态更新的fiber一直向上遍历到rootFiber，并返回rootFiber，
+// 且由于不同更新优先级不尽相同，所以过程中还会更新遍历到的fiber的优先级
 function markUpdateLaneFromFiberToRoot(
   sourceFiber: Fiber,
   lane: Lane,
@@ -164,6 +167,7 @@ function markUpdateLaneFromFiberToRoot(
   // Walk the parent path to the root and update the child lanes.
   let node = sourceFiber;
   let parent = sourceFiber.return;
+  /** 遍历父级fiber 并更新 parent 的 childLanes lane */
   while (parent !== null) {
     parent.childLanes = mergeLanes(parent.childLanes, lane);
     alternate = parent.alternate;

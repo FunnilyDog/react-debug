@@ -507,6 +507,7 @@ export function requestUpdateLane(fiber: Fiber): Lane {
   // The opaque type returned by the host config is internally a lane, so we can
   // use that directly.
   // TODO: Move this type conversion to the event priority module.
+  /** 当前事件为空直接返回默认lane，否则根据事件定义lane */
   const eventLane: Lane = (getCurrentEventPriority(): any);
   return eventLane;
 }
@@ -824,6 +825,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
 
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
+// ! wait
 function performConcurrentWorkOnRoot(root, didTimeout) {
   if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
     resetNestedUpdateFlag();
@@ -841,6 +843,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
   // Flush any pending passive effects before deciding which lanes to work on,
   // in case they schedule additional work.
   const originalCallbackNode = root.callbackNode;
+  /**  刷新pending状态的effects, 有可能某些effect会取消本次任务 */
   const didFlushPassiveEffects = flushPassiveEffects();
   if (didFlushPassiveEffects) {
     // Something in the passive effect phase may have canceled the current task.
@@ -849,14 +852,14 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
       // The current task was canceled. Exit. We don't need to call
       // `ensureRootIsScheduled` because the check above implies either that
       // there's a new task, or that there's no remaining work on this root.
+      /** 任务被取消, 退出调用 */
       return null;
     } else {
       // Current task was not canceled. Continue.
     }
   }
 
-  // Determine the next lanes to work on, using the fields stored
-  // on the root.
+  // 获取本次渲染的优先级
   let lanes = getNextLanes(
     root,
     root === workInProgressRoot ? workInProgressRootRenderLanes : NoLanes,
@@ -876,6 +879,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     !includesBlockingLane(root, lanes) &&
     !includesExpiredLane(root, lanes) &&
     (disableSchedulerTimeoutInWorkLoop || !didTimeout);
+    // 构造fiber树
   let exitStatus = shouldTimeSlice
     ? renderRootConcurrent(root, lanes)
     : renderRootSync(root, lanes);
@@ -893,6 +897,8 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     }
     if (exitStatus === RootFatalErrored) {
       const fatalError = workInProgressRootFatalError;
+       // 如果在render过程中产生了新的update, 且新update的优先级与最初render的优先级有交集
+      // 那么最初render无效, 丢弃最初render的结果, 等待下一次调度
       prepareFreshStack(root, NoLanes);
       markRootSuspended(root, lanes);
       ensureRootIsScheduled(root, now());
@@ -949,6 +955,7 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
       // or, if something suspended, wait to commit it after a timeout.
       root.finishedWork = finishedWork;
       root.finishedLanes = lanes;
+      // !调和阶段完成 提交fiber树
       finishConcurrentRender(root, exitStatus, lanes);
     }
   }
@@ -1658,6 +1665,7 @@ export function renderHasNotSuspendedYet(): boolean {
   return workInProgressRootExitStatus === RootInProgress;
 }
 
+// !render renderRootSync
 function renderRootSync(root: FiberRoot, lanes: Lanes) {
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
@@ -1831,6 +1839,7 @@ function workLoopConcurrent() {
   }
 }
 
+// !render 递过程
 function performUnitOfWork(unitOfWork: Fiber): void {
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
@@ -2365,6 +2374,7 @@ function releaseRootPooledCache(root: FiberRoot, remainingLanes: Lanes) {
   }
 }
 
+// ?干什么的
 export function flushPassiveEffects(): boolean {
   // Returns whether passive effects were flushed.
   // TODO: Combine this check with the one in flushPassiveEFfectsImpl. We should
@@ -2942,6 +2952,7 @@ export function warnAboutUpdateOnNotYetMountedFiberInDEV(fiber: Fiber) {
 let beginWork;
 if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
   const dummyFiber = null;
+  // !render beginWork
   beginWork = (current, unitOfWork, lanes) => {
     // If a component throws an error, we replay it again in a synchronously
     // dispatched event, so that the debugger will treat it as an uncaught
@@ -3087,6 +3098,7 @@ export function restorePendingUpdaters(root: FiberRoot, lanes: Lanes): void {
 
 const fakeActCallbackNode = {};
 // !render mount step 6
+// callback 就是 performConcurrentWorkOnRoot
 function scheduleCallback(priorityLevel, callback) {
   if (__DEV__) {
     // If we're currently inside an `act` scope, bypass Scheduler and push to

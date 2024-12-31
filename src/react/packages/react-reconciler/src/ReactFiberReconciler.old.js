@@ -244,7 +244,7 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
-// !createRoot createContainer
+// !createRoot 第二步 创建 FiberRoot
 export function createContainer(
   containerInfo: Container,
   tag: RootTag,
@@ -321,14 +321,15 @@ export function createHydrationContainer(
 
 // !render step 3
 export function updateContainer(
-  element: ReactNodeList, // App
-  container: OpaqueRoot,
+  element: ReactNodeList, // Index
+  container: OpaqueRoot, // root 
   parentComponent: ?React$Component<any, any>,
   callback: ?Function,
 ): Lane {
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
+  /** root 上挂载的fiber 节点 */
   const current = container.current;
   const eventTime = requestEventTime();
   const lane = requestUpdateLane(current);
@@ -389,7 +390,7 @@ export function updateContainer(
     update.callback = callback;
   }
 
-  // current = root ,
+  /** 将当前update添加到 concurrentQueues 中 从当前fiber 遍历更新到root */
   const root = enqueueUpdate(current, update, lane);
   if (root !== null) {
     scheduleUpdateOnFiber(root, current, lane, eventTime);

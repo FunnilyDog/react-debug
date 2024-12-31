@@ -48,6 +48,9 @@ export function flushSyncCallbacksOnlyInLegacyMode() {
   }
 }
 
+// !
+// 负责遍历上面提到的 syncQueue 数组，以同步的方式去一个一个地调用里面的 callback。
+// 一般情况下，这些 callback 就是指 performSyncWorkOnRoot()。
 export function flushSyncCallbacks() {
   if (!isFlushingSyncQueue && syncQueue !== null) {
     // Prevent re-entrance.

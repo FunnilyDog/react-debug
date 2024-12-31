@@ -122,36 +122,71 @@ function FiberNode(
   mode: TypeOfMode,
 ) {
   // Instance
-  this.tag = tag;
-  this.key = key;
+  /** 描述组件类型 */
+  this.tag = tag; 
+  this.key = key; 
   this.elementType = null;
-  this.type = null;
+  /** 表示节点类型。HostComponent 表示原生组件类型，此时 type 值为字符串 */
+  this.type = null; 
+  /** 指向节点的真实 DOM 对象 */
   this.stateNode = null;
 
   // Fiber
   this.return = null;
   this.child = null;
   this.sibling = null;
+  /** 表示当前节点是父元素的第几个子节点 */
   this.index = 0;
 
+  /** 
+   * 表示当前组件的 ref，原生组件的 ref 指向真实 DOM，
+   * 自定义组件的 ref 默认值为 null，可以通过 useImpretiveHandle 声明 */
   this.ref = null;
 
+  /** 表示新传入的 props 对象 */
   this.pendingProps = pendingProps;
+  /** 表示上一次的 props 对象  */
   this.memoizedProps = null;
+  /** 链表结构，用于收集副作用的操作 
+ export type UpdateQueue<State> = {
+  baseState: State,
+  firstBaseUpdate: Update<State> | null,
+  lastBaseUpdate: Update<State> | null,
+  shared: SharedQueue<State>,
+  effects: Array<Update<State>> | null,
+};
+  */
   this.updateQueue = null;
+  /** hook 链表结构的起点。在 React 中，所有的 hook 被存储在一个链表中  */
   this.memoizedState = null;
+  /** 更新时使用，用于判断是否依赖了 ContextProvider 中的值。
+   * eg: export type Dependencies = {
+   *  lanes: Lanes,
+   *  firstContext: ContextDependency<mixed> | null,
+   * };
+   */
   this.dependencies = null;
 
+  /** 渲染模式 一般为  ConcurrentMode = 0b000001; */
   this.mode = mode;
 
   // Effects
+  /** 节点的更新类型 */
   this.flags = NoFlags;
+  /** 子节点的更新类型 */
   this.subtreeFlags = NoFlags;
+  /** 存储要被删除的 Fiber 节点。
+   * 在 diff 过程中，如果发现节点存在但是不能复用，则会把节点存放在这里。 */
   this.deletions = null;
 
+  /** 优先级相关 */
   this.lanes = NoLanes;
   this.childLanes = NoLanes;
 
+  /** 与workinprogress fiber 互相指向
+   * workInProgress.alternate = current;
+   * current.alternate = workInProgress;
+   */
   this.alternate = null;
 
   if (enableProfilerTimer) {
@@ -427,9 +462,9 @@ export function resetWorkInProgress(workInProgress: Fiber, renderLanes: Lanes) {
   return workInProgress;
 }
 
-// !createRoot 
+// !createRoot 第三部 通过 tag 确定 mode； 创建并返回 fiber 实例
 export function createHostRootFiber(
-  tag: RootTag,
+  tag: RootTag, // 
   isStrictMode: boolean,
   concurrentUpdatesByDefaultOverride: null | boolean,
 ): Fiber {

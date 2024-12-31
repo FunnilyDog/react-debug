@@ -166,7 +166,7 @@ ReactDOMHydrationRoot.prototype.unmount = ReactDOMRoot.prototype.unmount = funct
   }
 };
 
-// !createRootImpl 3
+// !createRoot 入口
 export function createRoot(
   container: Element | Document | DocumentFragment,
   options?: CreateRootOptions,
@@ -225,9 +225,11 @@ export function createRoot(
     }
   }
 
+  /** 创建 tag = 1 的 FiberRoot 对象 
+   * 并在current 上挂载了一个 tag = 3, mode = 1 的空fiber */
   const root = createContainer(
     container,
-    ConcurrentRoot,
+    ConcurrentRoot, //  常量 1
     null,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
@@ -235,13 +237,14 @@ export function createRoot(
     onRecoverableError,
     transitionCallbacks,
   );
-  // node[internalContainerInstanceKey] = hostRoot;
+  // container[__reactContainer$(一串随机数)] = root.current;
   markContainerAsRoot(root.current, container);
 
   const rootContainerElement: Document | Element | DocumentFragment =
     container.nodeType === COMMENT_NODE
       ? (container.parentNode: any)
       : container;
+  /** 为 container 添加事件监听 */
   listenToAllSupportedEvents(rootContainerElement);
 
   return new ReactDOMRoot(root);

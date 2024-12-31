@@ -96,6 +96,7 @@ function FiberRootNode(
     this.hydrationCallbacks = null;
   }
 
+  /** false */
   if (enableTransitionTracing) {
     this.transitionCallbacks = null;
     const transitionLanesMap = (this.transitionLanes = []);
@@ -109,6 +110,7 @@ function FiberRootNode(
     this.passiveEffectDuration = 0;
   }
 
+  /** 初始化一个 pendingUpdatersLaneMap 并挂载到 FiberRootNode 实例上 */
   if (enableUpdaterTracking) {
     this.memoizedUpdaters = new Set();
     const pendingUpdatersLaneMap = (this.pendingUpdatersLaneMap = []);
@@ -129,7 +131,7 @@ function FiberRootNode(
   }
 }
 
-// !createRoot 
+// !createRoot 调用 FiberRootNode 构造函数 创建 FiberRoot 对象
 export function createFiberRoot(
   containerInfo: any,
   tag: RootTag,
@@ -146,6 +148,7 @@ export function createFiberRoot(
   onRecoverableError: null | ((error: mixed) => void),
   transitionCallbacks: null | TransitionTracingCallbacks,
 ): FiberRoot {
+  /** 创建空 FiberRootNode */
   const root: FiberRoot = (new FiberRootNode(
     containerInfo,
     tag,
@@ -153,21 +156,26 @@ export function createFiberRoot(
     identifierPrefix,
     onRecoverableError,
   ): any);
+
+  /** false */
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
   }
 
+  /** false */
   if (enableTransitionTracing) {
     root.transitionCallbacks = transitionCallbacks;
   }
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
+  /** 创建 tag = 3, mode = 1 的空fiber */
   const uninitializedFiber = createHostRootFiber(
     tag,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
   );
+  // !root.current 指向 该未初始化的 Fiber 实例
   root.current = uninitializedFiber;
   uninitializedFiber.stateNode = root;
 
@@ -175,13 +183,6 @@ export function createFiberRoot(
     const initialCache = createCache();
     retainCache(initialCache);
 
-    // The pooledCache is a fresh cache instance that is used temporarily
-    // for newly mounted boundaries during a render. In general, the
-    // pooledCache is always cleared from the root at the end of a render:
-    // it is either released when render commits, or moved to an Offscreen
-    // component if rendering suspends. Because the lifetime of the pooled
-    // cache is distinct from the main memoizedState.cache, it must be
-    // retained separately.
     root.pooledCache = initialCache;
     retainCache(initialCache);
     const initialState: RootState = {
@@ -203,6 +204,7 @@ export function createFiberRoot(
     uninitializedFiber.memoizedState = initialState;
   }
 
+  // !初始化更新队列
   initializeUpdateQueue(uninitializedFiber);
 
   return root;

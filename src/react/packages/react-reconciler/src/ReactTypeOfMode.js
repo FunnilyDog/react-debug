@@ -11,6 +11,7 @@ export type TypeOfMode = number;
 
 export const NoMode = /*                         */ 0b000000;
 // TODO: Remove ConcurrentMode by reading from the root tag instead
+/** 并发模式 */
 export const ConcurrentMode = /*                 */ 0b000001;
 export const ProfileMode = /*                    */ 0b000010;
 export const DebugTracingMode = /*               */ 0b000100;

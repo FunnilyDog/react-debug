@@ -64,7 +64,7 @@ let isDisallowedContextReadInDEV: boolean = false;
 export function resetContextDependencies(): void {
   // This is called right before React yields execution, to ensure `readContext`
   // cannot be called outside the render phase.
-  currentlyRenderingFiber = null;
+   currentlyRenderingFiber = null;
   lastContextDependency = null;
   lastFullyObservedContext = null;
   if (__DEV__) {

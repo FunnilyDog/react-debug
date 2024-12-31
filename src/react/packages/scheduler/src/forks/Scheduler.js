@@ -580,6 +580,7 @@ if (typeof localSetImmediate === 'function') {
   };
 }
 
+// !render
 function requestHostCallback(callback) {
   scheduledHostCallback = callback;
   if (!isMessageLoopRunning) {

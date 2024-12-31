@@ -10,4 +10,5 @@
 export type RootTag = 0 | 1;
 
 export const LegacyRoot = 0;
+/** 最新启动模式 ReactDOM.createRoot(rootNode).render(<App />) */
 export const ConcurrentRoot = 1;

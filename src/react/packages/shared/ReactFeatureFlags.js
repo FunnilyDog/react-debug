@@ -93,6 +93,7 @@ export const enableLegacyFBSupport = false;
 // likely to include in an upcoming release.
 // -----------------------------------------------------------------------------
 
+/** true */
 export const enableCache = __EXPERIMENTAL__;
 export const enableCacheElement = __EXPERIMENTAL__;
 
@@ -136,6 +137,7 @@ export const deletedTreeCleanUpLevel = 3;
 // <StrictMode /> to gradually upgrade components.
 // If TRUE, trees rendered with createRoot will be StrictEffectsMode.
 // If FALSE, these trees will be StrictLegacyMode.
+/** false */
 export const createRootStrictEffectsByDefault = false;
 
 export const disableModulePatternComponents = false;
@@ -227,6 +229,7 @@ export const debugRenderPhaseSideEffectsForStrictMode = __DEV__;
 
 // Helps identify code that is not safe for planned Offscreen API and Suspense semantics;
 // this feature flag only impacts StrictEffectsMode.
+/** 值为 __DEV__  */
 export const enableStrictEffects = __DEV__;
 
 // To preserve the "Pause on caught exceptions" behavior of the debugger, we
@@ -248,6 +251,7 @@ export const enableProfilerNestedUpdatePhase = __PROFILE__;
 export const enableDebugTracing = false;
 
 // Track which Fiber(s) schedule render work.
+/** true */
 export const enableUpdaterTracking = __PROFILE__;
 
 // Only enabled in RN, related to enableComponentStackLocations

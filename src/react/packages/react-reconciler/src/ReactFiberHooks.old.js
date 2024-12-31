@@ -370,6 +370,7 @@ function areHookInputsEqual(
   return true;
 }
 
+// !render
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -757,11 +758,13 @@ function mountReducer<S, I, A>(
   return [hook.memoizedState, dispatch];
 }
 
+// !updateState 也从这开始
 function updateReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
   init?: I => S,
 ): [S, Dispatch<A>] {
+  // 在旧 hook 链表上找到当前 hook 函数对应的 hook 对象，然后对它进行「浅拷贝」
   const hook = updateWorkInProgressHook();
   const queue = hook.queue;
 
@@ -2257,7 +2260,7 @@ function dispatchSetState<S, A>(
     eagerState: null,
     next: (null: any),
   };
-
+  /* 判断当前是否在渲染阶段 */
   if (isRenderPhaseUpdate(fiber)) {
     enqueueRenderPhaseUpdate(queue, update);
   } else {
@@ -2269,6 +2272,7 @@ function dispatchSetState<S, A>(
       // The queue is currently empty, which means we can eagerly compute the
       // next state before entering the render phase. If the new state is the
       // same as the current state, we may be able to bail out entirely.
+      /* 当前函数组件对应fiber没有处于调和渲染阶段 ，那么获取最新state , 执行更新 */
       const lastRenderedReducer = queue.lastRenderedReducer;
       if (lastRenderedReducer !== null) {
         let prevDispatcher;
