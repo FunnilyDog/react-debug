@@ -92,6 +92,7 @@ const localSetTimeout = typeof setTimeout === 'function' ? setTimeout : null;
 const localClearTimeout =
   typeof clearTimeout === 'function' ? clearTimeout : null;
 const localSetImmediate =
+// 已经弃用的api
   typeof setImmediate !== 'undefined' ? setImmediate : null; // IE and Node.js + jsdom
 
 const isInputPending =
@@ -372,6 +373,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     }
   } else {
     newTask.sortIndex = expirationTime;
+    // 将 newTask 放进 taskQueue 并按照 sortIndex 排序
     push(taskQueue, newTask);
     if (enableProfiling) {
       markTaskStart(newTask, currentTime);
@@ -580,7 +582,6 @@ if (typeof localSetImmediate === 'function') {
   };
 }
 
-// !render
 function requestHostCallback(callback) {
   scheduledHostCallback = callback;
   if (!isMessageLoopRunning) {

@@ -825,7 +825,8 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
 
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
-// ! wait
+
+/** 调度完成 进入 reconciler 阶段 */
 function performConcurrentWorkOnRoot(root, didTimeout) {
   if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
     resetNestedUpdateFlag();
@@ -1491,6 +1492,10 @@ function prepareFreshStack(root: FiberRoot, lanes: Lanes): Fiber {
   workInProgressRootConcurrentErrors = null;
   workInProgressRootRecoverableErrors = null;
 
+  // 将 queue.interleaved 移到 queue.pending 中 
+  // 这里的 queue 存的是 root.current.updateQueue.shared
+  // 在 enqueueConcurrentClassUpdate 方法中给 queue.interleaved 赋值为 update;
+  // 该update 是在 updateContainer 方法中 创建的 并将 payload属性赋值为了 render方法里的 第一个参数
   finishQueueingConcurrentUpdates();
 
   if (__DEV__) {
@@ -1691,6 +1696,7 @@ function renderRootSync(root: FiberRoot, lanes: Lanes) {
     }
 
     workInProgressTransitions = getTransitionsForLanes(root, lanes);
+    // 如果workinprogress不存在 则初始化一个 
     prepareFreshStack(root, lanes);
   }
 
@@ -1850,6 +1856,8 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   let next; // 用来存放beginWork()返回的结果
   if (enableProfilerTimer && (unitOfWork.mode & ProfileMode) !== NoMode) {
     startProfilerTimer(unitOfWork);
+    // 根据 workInProgress.tag 创建对应 fiber 
+    // 若 为 函数组件 则调用 renderWidthHook 执行函数组件 并 创建对应fiber
     next = beginWork(current, unitOfWork, subtreeRenderLanes);
     stopProfilerTimerIfRunningAndRecordDelta(unitOfWork, true);
   } else {
@@ -1859,7 +1867,8 @@ function performUnitOfWork(unitOfWork: Fiber): void {
   resetCurrentDebugFiberInDEV();
   // 更新状态了
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
-  if (next === null) { // beginWork返回null，表示无（或无需关注）当前节点的子Fiber节点
+  // beginWork返回null，表示无（或无需关注）当前节点的子Fiber节点
+  if (next === null) { 
     // If this doesn't spawn new work, complete the current work.
     completeUnitOfWork(unitOfWork);
   } else {
@@ -2952,7 +2961,6 @@ export function warnAboutUpdateOnNotYetMountedFiberInDEV(fiber: Fiber) {
 let beginWork;
 if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
   const dummyFiber = null;
-  // !render beginWork
   beginWork = (current, unitOfWork, lanes) => {
     // If a component throws an error, we replay it again in a synchronously
     // dispatched event, so that the debugger will treat it as an uncaught
@@ -2965,6 +2973,8 @@ if (__DEV__ && replayFailedUnitOfWorkWithInvokeGuardedCallback) {
       unitOfWork,
     );
     try {
+      // 根据 workInProgress.tag 创建对应 fiber 
+      // 若 为 函数组件 则调用 renderWidthHook 执行函数组件 并 创建对应fiber
       return originalBeginWork(current, unitOfWork, lanes);
     } catch (originalError) {
       if (

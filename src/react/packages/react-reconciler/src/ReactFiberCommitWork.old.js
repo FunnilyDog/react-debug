@@ -1523,7 +1523,9 @@ function commitPlacement(finishedWork: Fiber): void {
     case HostRoot:
     case HostPortal: {
       const parent: Container = parentFiber.stateNode.containerInfo;
+      // 找到 兄弟节点
       const before = getHostSibling(finishedWork);
+      // 递归 插入/添加 子节点
       insertOrAppendPlacementNodeIntoContainer(finishedWork, before, parent);
       break;
     }
@@ -1536,6 +1538,7 @@ function commitPlacement(finishedWork: Fiber): void {
   }
 }
 
+// 递归插入/添加 子节点
 function insertOrAppendPlacementNodeIntoContainer(
   node: Fiber,
   before: ?Instance,
@@ -1546,8 +1549,10 @@ function insertOrAppendPlacementNodeIntoContainer(
   if (isHost) {
     const stateNode = node.stateNode;
     if (before) {
+      // 如果已有子节点则插入到子节点后
       insertInContainerBefore(parent, stateNode, before);
     } else {
+      // 调用element.appendchild 插入子节点
       appendChildToContainer(parent, stateNode);
     }
   } else if (tag === HostPortal) {

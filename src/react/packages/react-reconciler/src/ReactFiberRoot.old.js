@@ -204,7 +204,7 @@ export function createFiberRoot(
     uninitializedFiber.memoizedState = initialState;
   }
 
-  // !初始化更新队列
+  // 给fiber 的 updateQueue 赋初始值
   initializeUpdateQueue(uninitializedFiber);
 
   return root;

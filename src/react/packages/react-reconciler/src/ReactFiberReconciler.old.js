@@ -366,7 +366,7 @@ export function updateContainer(
  *   eventTime: number,
  *   lane: Lane,
  *   tag: 0 | 1 | 2 | 3,
- *   payload: Index,
+ *   payload: ReactDOM.render 的第一个传参。
  *   callback: (() => mixed) | null,
  *   next: Update<State> | null,
  *  }
@@ -390,7 +390,9 @@ export function updateContainer(
     update.callback = callback;
   }
 
-  /** 将当前update添加到 concurrentQueues 中 从当前fiber 遍历更新到root */
+  /** 
+   * 将当前update添加到 ReactFiberConcurrentUpdates文件 全局变量 concurrentQueues 中
+   * 用传入的 lane 更新fiber链表中的所有 lane 并返回 root */
   const root = enqueueUpdate(current, update, lane);
   if (root !== null) {
     scheduleUpdateOnFiber(root, current, lane, eventTime);

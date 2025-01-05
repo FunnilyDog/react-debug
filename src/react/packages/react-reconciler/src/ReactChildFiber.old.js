@@ -1135,6 +1135,7 @@ function ChildReconciler(shouldTrackSideEffects) {
     const key = element.key;
     let child = currentFirstChild;
     while (child !== null) {
+      // !!! fiber 的 diff 过程
       // TODO: If key === null and child.key === null, then this only applies to
       // the first item in the list.
       if (child.key === key) {
@@ -1242,7 +1243,7 @@ function ChildReconciler(shouldTrackSideEffects) {
   // This API will tag the children with the side-effect of the reconciliation
   // itself. They will be added to the side-effect list as we pass through the
   // children and the parent.
-  // !render 
+  //  根据 newChild.$$typeof 不同类型 创建 fiber
   function reconcileChildFibers(
     returnFiber: Fiber,
     currentFirstChild: Fiber | null,
@@ -1269,8 +1270,9 @@ function ChildReconciler(shouldTrackSideEffects) {
     // Handle object types
     if (typeof newChild === 'object' && newChild !== null) {
       switch (newChild.$$typeof) {
-        case REACT_ELEMENT_TYPE:
+        case REACT_ELEMENT_TYPE: // react.element
           return placeSingleChild(
+            // 调用 createFiberFromElement 为child 创建 fiber 
             reconcileSingleElement(
               returnFiber,
               currentFirstChild,
@@ -1278,7 +1280,7 @@ function ChildReconciler(shouldTrackSideEffects) {
               lanes,
             ),
           );
-        case REACT_PORTAL_TYPE:
+        case REACT_PORTAL_TYPE: // react.portal
           return placeSingleChild(
             reconcileSinglePortal(
               returnFiber,
@@ -1287,7 +1289,7 @@ function ChildReconciler(shouldTrackSideEffects) {
               lanes,
             ),
           );
-        case REACT_LAZY_TYPE:
+        case REACT_LAZY_TYPE: // react.lazy
           const payload = newChild._payload;
           const init = newChild._init;
           // TODO: This function is supposed to be non-recursive.

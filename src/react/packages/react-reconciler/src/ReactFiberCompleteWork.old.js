@@ -639,6 +639,7 @@ function cutOffTailIfNeeded(
   }
 }
 
+// 将所有child 的 return赋值为 completedWork；计算 completedWork 的 subtreeFlags
 function bubbleProperties(completedWork: Fiber) {
   const didBailout =
     completedWork.alternate !== null &&
@@ -1076,6 +1077,8 @@ function completeWork(
           );
         }
       }
+      // 将所有child 的 return赋值为 completedWork；
+      // 计算 completedWork 的 subtreeFlags
       bubbleProperties(workInProgress);
       return null;
     }

@@ -280,7 +280,9 @@ function dispatchEventsForPlugins(
   targetContainer: EventTarget,
 ): void {
   const nativeEventTarget = getEventTarget(nativeEvent);
+  // 存储的事件 & 事件处理函数的队列
   const dispatchQueue: DispatchQueue = [];
+  // 根据当前Fiber去收集事件 & 事件处理函数
   extractEvents(
     dispatchQueue,
     domEventName,
@@ -324,6 +326,7 @@ export function listenToNonDelegatedEvent(
   }
 }
 
+// 调用 addTrappedEventListener 方法 为 target 添加 domEventName 事件监听
 export function listenToNativeEvent(
   domEventName: DOMEventName,
   isCapturePhaseListener: boolean,
@@ -384,6 +387,7 @@ const listeningMarker =
     .toString(36)
     .slice(2);
 
+/** 为 rootContainerElement 添加事件监听 */
 export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
   if (!(rootContainerElement: any)[listeningMarker]) {
     (rootContainerElement: any)[listeningMarker] = true;
@@ -412,6 +416,7 @@ export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
   }
 }
 
+// 调用 createEventListenerWrapperWithPriority 创建 事件监听回调函数 并将其绑定
 function addTrappedEventListener(
   targetContainer: EventTarget,
   domEventName: DOMEventName,
@@ -534,6 +539,7 @@ function isMatchingRootContainer(
   );
 }
 
+// 
 export function dispatchEventForPluginEventSystem(
   domEventName: DOMEventName,
   eventSystemFlags: EventSystemFlags,

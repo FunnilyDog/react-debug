@@ -31,7 +31,6 @@ let concurrentQueues: Array<
   HookQueue<any, any> | ClassQueue<any>,
 > | null = null;
 
-// !render
 export function pushConcurrentUpdateQueue(
   queue: HookQueue<any, any> | ClassQueue<any>,
 ) {
@@ -42,6 +41,11 @@ export function pushConcurrentUpdateQueue(
   }
 }
 
+// 只是将 queue.interleaved 移到 queue.pending 中 
+// ? 是怎么跟 fiber 树 挂钩的？
+// 这里的 queue 存的是 root.current.updateQueue.shared
+// 在 enqueueConcurrentClassUpdate 方法中给 queue.interleaved 赋值为 update;
+// 该update 是在 updateContainer 方法中 创建的 并将 payload属性赋值为了 render方法里的 第一个参数
 export function finishQueueingConcurrentUpdates() {
   // Transfer the interleaved updates onto the main queue. Each queue has a
   // `pending` field and an `interleaved` field. When they are not null, they
@@ -115,16 +119,15 @@ export function enqueueConcurrentHookUpdateAndEagerlyBailout<S, A>(
 export function enqueueConcurrentClassUpdate<State>(
   fiber: Fiber, // root
   queue: ClassQueue<State>, // 初始
-  update: ClassUpdate<State>, // update任务
+  update: ClassUpdate<State>, // 初始值 payload 值为 element
   lane: Lane,
 ) {
   const interleaved = queue.interleaved;
   if (interleaved === null) {
-    // This is the first update. Create a circular list.
+      // 首次更新
+      // 将update链表更新为环形链表
     update.next = update;
-    // At the end of the current render, this queue's interleaved updates will
-    // be transferred to the pending queue.
-    /** 将当前 queue 添加到 concurrentQueues */
+    /** 将当前 queue 添加到  ReactFiberConcurrentUpdates文件 全局变量 concurrentQueues 中 */
     pushConcurrentUpdateQueue(queue);
   } else {
     update.next = interleaved.next;

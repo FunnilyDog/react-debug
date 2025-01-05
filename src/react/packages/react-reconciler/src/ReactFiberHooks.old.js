@@ -422,7 +422,7 @@ export function renderWithHooks<Props, SecondArg>(
       // This dispatcher does that.
       ReactCurrentDispatcher.current = HooksDispatcherOnMountWithHookTypesInDEV;
     } else {
-      // 初始挂载
+      // 初始挂载hook方法
       ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
     }
   } else {
@@ -2623,6 +2623,7 @@ if (__DEV__) {
       currentHookNameInDev = 'useReducer';
       mountHookTypesDev();
       const prevDispatcher = ReactCurrentDispatcher.current;
+      // ? 这里 切换成 InvalidNestedHooksDispatcherOnMountInDEV 是为什么
       ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnMountInDEV;
       try {
         return mountReducer(reducer, initialArg, init);
@@ -2641,6 +2642,7 @@ if (__DEV__) {
       currentHookNameInDev = 'useState';
       mountHookTypesDev();
       const prevDispatcher = ReactCurrentDispatcher.current;
+      // 切换后 只多了一个方法 warnInvalidHookAccess 用于报waring信息 hook方法只能在顶层调用
       ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnMountInDEV;
       try {
         return mountState(initialState);

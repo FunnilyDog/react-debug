@@ -289,20 +289,23 @@ if (__DEV__) {
 export function reconcileChildren(
   current: Fiber | null,
   workInProgress: Fiber,
-  nextChildren: any,
+  nextChildren: any, // 初次挂载时为 render 方法 中的参数 
   renderLanes: Lanes,
 ) {
+  // 挂载阶段
   if (current === null) {
     // If this is a fresh new component that hasn't been rendered yet, we
     // won't update its child set by applying minimal side-effects. Instead,
     // we will add them all to the child before it gets rendered. That means
     // we can optimize this reconciliation pass by not tracking side-effects.
+    // mountChildFibers 也就是初始化 ChildReconciler 后 执行 reconcileChildFibers
     workInProgress.child = mountChildFibers(
       workInProgress,
       null,
       nextChildren,
       renderLanes,
     );
+    // 更新阶段
   } else {
     // If the current child is the same as the work in progress, it means that
     // we haven't yet started any work on these children. Therefore, we use
@@ -1286,11 +1289,20 @@ function updateHostRoot(current, workInProgress, renderLanes) {
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState.element;
+  // 将 current 的 UpdateQueue 拷贝给 workInProgress
   cloneUpdateQueue(current, workInProgress);
+  /**
+   * 将当前将要进行的更新 shared.pending 的环形链表，拆开拼接到到 lastBaseUpdate 的后面；
+   * 执行 firstBaseUpdate 链表的操作时，若当前 update 对应的任务的优先级符合要求，则执行；
+   * 若优先级较低，则存储执行到当前节点的状态，做为下次渲染时的初始值，和接下来所有的 update 节点；
+   * 将执行所有操作后得到的 newState 重新给到 workInProgress.memoizedState；
+   * 然后存储刚才淘汰下来的低优先级任务的链表，以便下次更新；
+   */
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
 
   const nextState: RootState = workInProgress.memoizedState;
   const root: FiberRoot = workInProgress.stateNode;
+  // 该方法不会执行
   pushRootTransition(workInProgress, root, renderLanes);
 
   if (enableCache) {
@@ -1818,6 +1830,7 @@ function mountIndeterminateComponent(
       pushMaterializedTreeId(workInProgress);
     }
 
+    // 将子节点
     reconcileChildren(null, workInProgress, value, renderLanes);
     if (__DEV__) {
       validateFunctionComponentInDev(workInProgress, Component);
@@ -3685,7 +3698,7 @@ function attemptEarlyBailoutIfNoScheduledUpdate(
   return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
 }
 
-// !render beginWork
+// !render 
 function beginWork(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -3709,6 +3722,7 @@ function beginWork(
     }
   }
 
+  // 更新阶段
   if (current !== null) {
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
@@ -3782,6 +3796,7 @@ function beginWork(
   workInProgress.lanes = NoLanes;
 
   switch (workInProgress.tag) {
+    // 挂载时
     case IndeterminateComponent: {
       return mountIndeterminateComponent(
         current,

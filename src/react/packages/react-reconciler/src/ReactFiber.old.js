@@ -148,16 +148,31 @@ function FiberNode(
   /** 表示上一次的 props 对象  */
   this.memoizedProps = null;
   /** 链表结构，用于收集副作用的操作 
- export type UpdateQueue<State> = {
-  baseState: State,
-  firstBaseUpdate: Update<State> | null,
-  lastBaseUpdate: Update<State> | null,
-  shared: SharedQueue<State>,
-  effects: Array<Update<State>> | null,
-};
+   *  export type UpdateQueue<State> = {
+   *   baseState: State, // 表示此队列的基础state
+   *   firstBaseUpdate: Update<State> | null, // 指向基础队列的队首
+   *   lastBaseUpdate: Update<State> | null, // 指向基础队列的队尾
+   *   shared: SharedQueue<State>, // 本次渲染时要执行的任务
+   *   effects: Array<Update<State>> | null, // 用于保存有回调函数的update对象，在commit之后，会依次调用这里的回调函数.
+   * };
+   * 
+   * export type SharedQueue<State> = {
+   *   pending: Update<State> | null,  // 更新操作的循环链表
+   *   interleaved: Update<State> | null, //  是指向当前队列中的交错更新链表
+   *   lanes: Lanes,
+   * };
   */
   this.updateQueue = null;
-  /** hook 链表结构的起点。在 React 中，所有的 hook 被存储在一个链表中  */
+  /** 
+   * hook 链表结构的起点。在 React 中，所有的 hook 被存储在一个链表中
+   * export type Hook = {
+   *   memoizedState: any, // 内存状态，用于输出成最终的fiber树 
+   *   baseState: any, 基础状态，当Hook.queue更过后，basestate也会更新.
+   *   baseQueue: Update<any, any> | null, // 基础状态队列，在reconciler阶段会辅助状态合并.
+   *   queue: any,  // 指向一个Update队列
+   *   next: Hook | null, // 指向该function组件的下一个Hook对象，使得多个Hook之间也构成了一个链表.
+   * };
+    */
   this.memoizedState = null;
   /** 更新时使用，用于判断是否依赖了 ContextProvider 中的值。
    * eg: export type Dependencies = {

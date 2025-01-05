@@ -13,7 +13,9 @@ export const NoMode = /*                         */ 0b000000;
 // TODO: Remove ConcurrentMode by reading from the root tag instead
 /** 并发模式 */
 export const ConcurrentMode = /*                 */ 0b000001;
+/** 配置模式 */
 export const ProfileMode = /*                    */ 0b000010;
+/** 调试跟踪模式 */
 export const DebugTracingMode = /*               */ 0b000100;
 export const StrictLegacyMode = /*               */ 0b001000;
 export const StrictEffectsMode = /*              */ 0b010000;

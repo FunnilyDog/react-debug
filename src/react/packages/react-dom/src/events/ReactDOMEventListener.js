@@ -83,6 +83,7 @@ export function createEventListenerWrapper(
   );
 }
 
+// 通过 dispatchEvent 创建事件监听回调
 export function createEventListenerWrapperWithPriority(
   targetContainer: EventTarget,
   domEventName: DOMEventName,
@@ -107,7 +108,7 @@ export function createEventListenerWrapperWithPriority(
     domEventName,
     eventSystemFlags,
     targetContainer,
-  );
+  )
 }
 
 function dispatchDiscreteEvent(
@@ -146,6 +147,7 @@ function dispatchContinuousEvent(
   }
 }
 
+// 
 export function dispatchEvent(
   domEventName: DOMEventName,
   eventSystemFlags: EventSystemFlags,
@@ -262,12 +264,14 @@ function dispatchEventOriginal(
   );
 }
 
+/** 触发事件的回调方法 */
 function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay(
   domEventName: DOMEventName,
   eventSystemFlags: EventSystemFlags,
   targetContainer: EventTarget,
   nativeEvent: AnyNativeEvent,
 ) {
+  // 找到 event.target 所对应的 Fiber  赋值给 当前作用域下的 return_targetInst 属性
   let blockedOn = findInstanceBlockingEvent(
     domEventName,
     eventSystemFlags,
@@ -275,6 +279,7 @@ function dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEve
     nativeEvent,
   );
   if (blockedOn === null) {
+    // 执行依赖收集函数
     dispatchEventForPluginEventSystem(
       domEventName,
       eventSystemFlags,
