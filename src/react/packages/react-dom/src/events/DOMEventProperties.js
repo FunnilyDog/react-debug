@@ -104,7 +104,7 @@ export const topLevelEventsToReactNames: Map<
 //   'wheel',
 // ];
 
-const simpleEventPluginEvents = [ 'click']
+const simpleEventPluginEvents = [ 'click','mouseDown']
 if (enableCreateEventHandleAPI) {
   // Special case: these two events don't have on* React handler
   // and are only accessible via the createEventHandle API.

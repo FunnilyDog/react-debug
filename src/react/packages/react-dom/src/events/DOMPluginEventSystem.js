@@ -238,6 +238,7 @@ function processDispatchQueueItemsInOrder(
 ): void {
   let previousInstance;
   if (inCapturePhase) {
+    // 捕获阶段从后往前
     for (let i = dispatchListeners.length - 1; i >= 0; i--) {
       const {instance, currentTarget, listener} = dispatchListeners[i];
       if (instance !== previousInstance && event.isPropagationStopped()) {
@@ -249,6 +250,8 @@ function processDispatchQueueItemsInOrder(
   } else {
     for (let i = 0; i < dispatchListeners.length; i++) {
       const {instance, currentTarget, listener} = dispatchListeners[i];
+      // 这里调用了 isPropagationStopped，如果事件在冒泡时，执行力event.stopPropagation()，
+      // 则此函数返回为true，后续的listener也不会执行了
       if (instance !== previousInstance && event.isPropagationStopped()) {
         return;
       }
@@ -710,6 +713,7 @@ export function accumulateSinglePhaseListeners(
 
       // Standard React on* listeners, i.e. onClick or onClickCapture
       if (reactEventName !== null) {
+        // 通过 reactEventName 去匹配该 Fiber 的 props，匹配成功后，即可获得事件的执行函数
         const listener = getListener(instance, reactEventName);
         if (listener != null) {
           listeners.push(

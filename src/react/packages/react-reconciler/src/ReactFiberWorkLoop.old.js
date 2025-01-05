@@ -720,6 +720,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
   // Check if there's an existing task. We may be able to reuse it.
   const existingCallbackPriority = root.callbackPriority;
   if (
+    // 优先级相同 在之前的 hook uodate
     existingCallbackPriority === newCallbackPriority &&
     // Special case related to `act`. If the currently scheduled task is a
     // Scheduler task, rather than an `act` task, cancel it and re-scheduled
@@ -763,6 +764,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
       }
       scheduleLegacySyncCallback(performSyncWorkOnRoot.bind(null, root));
     } else {
+      // setState 走到该分支
       scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root));
     }
     if (supportsMicrotasks) {

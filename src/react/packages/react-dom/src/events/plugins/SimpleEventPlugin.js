@@ -106,6 +106,7 @@ function extractEvents(
     case 'mouseout':
     case 'mouseover':
     case 'contextmenu':
+      // 收集事件，并对事件进行封装，以及其他兼容性的处理，这个也就是后续我们在 JSX 回调函数中可以获取到的事件
       SyntheticEventCtor = SyntheticMouseEvent;
       break;
     case 'drag':
@@ -194,6 +195,7 @@ function extractEvents(
       // This is a breaking change that can wait until React 18.
       domEventName === 'scroll';
 
+    // 收集事件的处理函数
     const listeners = accumulateSinglePhaseListeners(
       targetInst,
       reactName,

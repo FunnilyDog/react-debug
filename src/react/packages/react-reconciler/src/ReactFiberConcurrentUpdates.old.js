@@ -85,6 +85,7 @@ export function enqueueConcurrentHookUpdate<S, A>(
     update.next = update;
     // At the end of the current render, this queue's interleaved updates will
     // be transferred to the pending queue.
+    // 将 queue 放入到 当前全局作用域上的 concurrentQueues 属性中
     pushConcurrentUpdateQueue(queue);
   } else {
     update.next = interleaved.next;
@@ -92,6 +93,7 @@ export function enqueueConcurrentHookUpdate<S, A>(
   }
   queue.interleaved = update;
 
+  // 重新计算lane 并返回 rootfiber
   return markUpdateLaneFromFiberToRoot(fiber, lane);
 }
 
