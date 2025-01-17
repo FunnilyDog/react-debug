@@ -2260,7 +2260,7 @@ function dispatchSetState<S, A>(
     eagerState: null,
     next: (null: any),
   };
-  /* 判断当前是否在渲染阶段 */
+  // 如果当前正在处理这个fiber，触发了dispatch
   if (isRenderPhaseUpdate(fiber)) {
     enqueueRenderPhaseUpdate(queue, update);
   } else {
@@ -2339,6 +2339,7 @@ function enqueueRenderPhaseUpdate<S, A>(
   // This is a render phase update. Stash it in a lazily-created map of
   // queue -> linked list of updates. After this render pass, we'll restart
   // and apply the stashed updates on top of the work-in-progress hook.
+  // 注意这个参数用于防止循环渲染
   didScheduleRenderPhaseUpdateDuringThisPass = didScheduleRenderPhaseUpdate = true;
   const pending = queue.pending;
   if (pending === null) {

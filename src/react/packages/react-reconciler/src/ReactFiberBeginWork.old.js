@@ -3722,7 +3722,7 @@ function beginWork(
     }
   }
 
-  // 更新阶段
+  // 更新阶段 或者 rootFiber
   if (current !== null) {
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;

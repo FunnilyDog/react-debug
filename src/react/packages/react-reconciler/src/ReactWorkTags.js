@@ -37,6 +37,7 @@ export type WorkTag =
 
 /**  函数组件 */
 export const FunctionComponent = 0; 
+/** 类组件 */
 export const ClassComponent = 1; 
 /** 函数组件 或 class 组件 */
 export const IndeterminateComponent = 2; // Before we know whether it is function or class

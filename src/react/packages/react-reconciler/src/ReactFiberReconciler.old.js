@@ -323,14 +323,15 @@ export function createHydrationContainer(
 export function updateContainer(
   element: ReactNodeList, // Index
   container: OpaqueRoot, // root 
-  parentComponent: ?React$Component<any, any>,
-  callback: ?Function,
+  parentComponent: ?React$Component<any, any>, // null
+  callback: ?Function, // null
 ): Lane {
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
   /** root 上挂载的fiber 节点 */
   const current = container.current;
+  // ReactFiberWorkLoop 中的 工具函数，用于获取当前任务开始时间
   const eventTime = requestEventTime();
   const lane = requestUpdateLane(current);
 

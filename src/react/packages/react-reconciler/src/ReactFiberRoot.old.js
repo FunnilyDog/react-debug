@@ -169,7 +169,7 @@ export function createFiberRoot(
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
-  /** 创建 tag = 3, mode = 1 的空fiber */
+  /**  创建 tag = 3, mode = 1 的空fiber */
   const uninitializedFiber = createHostRootFiber(
     tag,
     isStrictMode,

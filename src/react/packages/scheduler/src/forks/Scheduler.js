@@ -192,15 +192,19 @@ function workLoop(hasTimeRemaining, initialTime) {
   let currentTime = initialTime;
   advanceTimers(currentTime);
   currentTask = peek(taskQueue);
+  
   while (
     currentTask !== null &&
     !(enableSchedulerDebugging && isSchedulerPaused)
   ) {
+    // 过期时间只是用作判断最迟的执行时间，并且用于排序。
+    // startTime 才是一个任务真正应该的起始时间。
+    // 如果任务未过期，但是里面的startTime都已经开始了，此时有剩余执行时间，依然是可以执行的。
     if (
       currentTask.expirationTime > currentTime &&
       (!hasTimeRemaining || shouldYieldToHost())
     ) {
-      // This currentTask hasn't expired, and we've reached the deadline.
+    // 如果任务没有过期，且没有多余时间执行任务，那么就会退出执行。
       break;
     }
     const callback = currentTask.callback;
@@ -223,10 +227,12 @@ function workLoop(hasTimeRemaining, initialTime) {
           markTaskCompleted(currentTask, currentTime);
           currentTask.isQueued = false;
         }
+         // 否则的话，将当前任务移除。中断在这个位置发生，高优先任务会把低优先任务的callback置空。
         if (currentTask === peek(taskQueue)) {
           pop(taskQueue);
         }
       }
+      // 更新 timerQueue
       advanceTimers(currentTime);
     } else {
       pop(taskQueue);

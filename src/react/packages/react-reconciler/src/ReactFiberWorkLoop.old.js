@@ -425,6 +425,10 @@ export function getWorkInProgressRoot(): FiberRoot | null {
   return workInProgressRoot;
 }
 
+/** 
+ * 如果是 render 或者 commit 阶段 直接返回 now
+ * 否则将 currentEventTime 赋值为 now 并返回  
+ * */
 export function requestEventTime() {
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
     // We're inside React, so it's fine to read the actual time.
@@ -436,6 +440,7 @@ export function requestEventTime() {
     return currentEventTime;
   }
   // This is the first update since React yielded. Compute a new start time.
+  // performance.now 返回当前脚本执行时间
   currentEventTime = now();
   return currentEventTime;
 }
@@ -797,6 +802,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
     newCallbackNode = null;
   } else {
     let schedulerPriorityLevel;
+     // 将 lanes 转化为 scheduler 库的优先级
     switch (lanesToEventPriority(nextLanes)) {
       case DiscreteEventPriority:
         schedulerPriorityLevel = ImmediateSchedulerPriority;
@@ -872,12 +878,12 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     return null;
   }
 
-  // We disable time-slicing in some cases: if the work has been CPU-bound
-  // for too long ("expired" work, to prevent starvation), or we're in
-  // sync-updates-by-default mode.
-  // TODO: We only check `didTimeout` defensively, to account for a Scheduler
-  // bug we're still investigating. Once the bug in Scheduler is fixed,
-  // we can remove this, since we track expiration ourselves.
+  // shouldTimeSlice 会判断当前是 默认还是有用户输入，如果是的话就是同步渲染。
+  // didTimeout = currentTask.expirationTime <= currentTime 过期时间 <= 当前时间
+  // didTimeout 表示当前的任务是否过期，如果过期了，那么同步执行。否则并发执行。
+  // 如果有用户输入的 lane 或者 过期 lane，并且上述条件满足，
+  // 那么会执行 renderRootConcurrent，否则按同步执行。
+  // disableSchedulerTimeoutInWorkLoop = false
   const shouldTimeSlice =
     !includesBlockingLane(root, lanes) &&
     !includesExpiredLane(root, lanes) &&
@@ -963,10 +969,15 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
     }
   }
 
+  // 完成后，继续 schedule，发现没有 lane 就退出了
+  // 相当于判断这里有没有更高优先级的任务,
+  // 如果没有, 那么下面的比较会执行，然后 performConcurrentWorkOnRoot
+  // 否则 callbackNode.callback = null 
   ensureRootIsScheduled(root, now());
+  // 中间经历了 render 阶段 + commit 阶段，如果完成了话，那么 callbackNode 为 null
+  // 如果任务被打断了，root.callbackNode 也为 null
   if (root.callbackNode === originalCallbackNode) {
-    // The task node scheduled for this root is the same one that's
-    // currently executed. Need to return a continuation.
+    // 这里相当于又将当前任务返回去了，那么任务就还是现在的任务。
     return performConcurrentWorkOnRoot.bind(null, root);
   }
   return null;
@@ -2106,6 +2117,7 @@ function commitRootImpl(
   // might get scheduled in the commit phase. (See #16714.)
   // TODO: Delete all other places that schedule the passive effect callback
   // They're redundant.
+  // export const PassiveMask = Passive | ChildDeletion;
   if (
     (finishedWork.subtreeFlags & PassiveMask) !== NoFlags ||
     (finishedWork.flags & PassiveMask) !== NoFlags

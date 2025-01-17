@@ -1,5 +1,8 @@
 {
     "extends": "react-app",
+    "ignorePatterns": [
+        "src/react/*"
+    ],
     "globals": {
         "__DEV__": true,
         "__PROFILE__": true,

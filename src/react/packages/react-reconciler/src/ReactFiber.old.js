@@ -128,7 +128,9 @@ function FiberNode(
   this.elementType = null;
   /** 表示节点类型。HostComponent 表示原生组件类型，此时 type 值为字符串 */
   this.type = null; 
-  /** 指向节点的真实 DOM 对象 */
+  // 对于 普通标签，如 div，存储着对应的真实节点
+  // 对于 class 组件，存储着对应的 实例
+  // 对于 RootFiber，指向的是 FiberRoot
   this.stateNode = null;
 
   // Fiber
@@ -148,6 +150,7 @@ function FiberNode(
   /** 表示上一次的 props 对象  */
   this.memoizedProps = null;
   /** 链表结构，用于收集副作用的操作 
+   *  ClassComponent和HostRoot 
    *  export type UpdateQueue<State> = {
    *   baseState: State, // 表示此队列的基础state
    *   firstBaseUpdate: Update<State> | null, // 指向基础队列的队首
@@ -162,6 +165,8 @@ function FiberNode(
    *   lanes: Lanes,
    * };
   */
+  // HostComponent的updateQueue主要记录props的变化。
+  // FunctionComponent 主要用于存放生命周期的回调函数
   this.updateQueue = null;
   /** 
    * hook 链表结构的起点。在 React 中，所有的 hook 被存储在一个链表中

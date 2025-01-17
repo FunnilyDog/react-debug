@@ -243,6 +243,7 @@ export function enqueueUpdate<State>(
     }
   }
 
+  // 已经在 render 阶段走该分支
   if (isUnsafeClassRenderPhaseUpdate(fiber)) {
     // This is an unsafe render phase update. Add directly to the update
     // queue so we can process it immediately during the current render.
@@ -481,6 +482,7 @@ export function processUpdateQueue<State>(
 
     // The pending queue is circular. Disconnect the pointer between first
     // and last so that it's non-circular.
+    // 找到最先的 update，然后将最后的一个 update 的 next 断开
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
     lastPendingUpdate.next = null;

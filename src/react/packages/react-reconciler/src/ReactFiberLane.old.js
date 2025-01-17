@@ -510,6 +510,7 @@ export function claimNextRetryLane(): Lane {
   return lane;
 }
 
+// 获取二进制数中最后一个为1的位的值
 export function getHighestPriorityLane(lanes: Lanes): Lane {
   return lanes & -lanes;
 }
@@ -571,7 +572,6 @@ export function createLaneMap<T>(initial: T): LaneMap<T> {
   return laneMap;
 }
 
-//  !render
 export function markRootUpdated(
   root: FiberRoot,
   updateLane: Lane,

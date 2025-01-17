@@ -14,7 +14,9 @@ import {enableServerContext} from 'shared/ReactFeatureFlags';
 import {ContextRegistry} from './ReactServerContextRegistry';
 
 const ReactSharedInternals = {
+  /** 内置 hook 方法挂载位置  */
   ReactCurrentDispatcher,
+  /** */
   ReactCurrentBatchConfig,
   ReactCurrentOwner,
 };

@@ -2725,6 +2725,7 @@ function reappearLayoutEffects_complete(subtreeRoot: Fiber) {
   }
 }
 
+// 遍历 root.current 的 updateQueue，执行上面的 effect 的 create 方法
 export function commitPassiveMountEffects(
   root: FiberRoot,
   finishedWork: Fiber,
